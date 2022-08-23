@@ -10,4 +10,20 @@ spring:
     base-url: http://192.168.6.152:9411/
     sender:
       type: web
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]': #只要有人处理请求了，这个跨域就能生效
+            allowedOrigins: #允许所有地址来源跨域
+              - "*"
+            allowedMethods: #允许所有请求方式跨域
+              - "*"
+            #所有的网关路由规则
+      #所有的网关路由规则
+      routes:
+        - id: product_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
+          uri: lb://service-product
+          predicates:  #断言
+            - Path=/admin/product/**
 

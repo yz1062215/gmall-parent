@@ -10,6 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <!--父工程-->
     <packaging>pom</packaging>
+    <modules>
+        <module>service-product</module>
+    </modules>
     <artifactId>service</artifactId>
 
     <dependencies>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.gmall.product.mapper.BaseAttrInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.gmall.model.product.BaseAttrInfo">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="attrName" column="attr_name" jdbcType="VARCHAR"/>
+        <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+        <result property="categoryLevel" column="category_level" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,attr_name,category_id,
+        category_level
+    </sql>
+    <!--自定义结果集  将自定义sql查询到的结果按照自定义的形式封装为BaseAttrInfo对象-->
+    <resultMap id="AttrInfoAndValue" type="com.atguigu.gmall.model.product.BaseAttrInfo" autoMapping="true">
+        <!--将字段相同的属性封装到一个对象中-->
+        <id column="id" property="id"></id>
+<!--        <result column="attr_name" property="attrName"></result>-->
+<!--        <result column="category_id" property="categoryId"></result>-->
+<!--        <result column="category_level" property="categoryLevel"></result>-->
+        <!--指定字段名为attrValueList  并且指定其类型-->
+        <!--autoMapping="true" 开启自动映射 当数据库中的属性字段和bean的字段一一对应且符合驼峰规则时 -->
+        <collection property="attrValueList" ofType="com.atguigu.gmall.model.product.BaseAttrValue" autoMapping="true">
+            <id column="vid" property="id"></id>
+<!--            <result column="value_name" property="valueName"></result>-->
+<!--            <result column="attr_id" property="attrId"></result>-->
+        </collection>
+    </resultMap>
+
+    <select id="getAttrInfoAndValueByCategoryId" resultMap="AttrInfoAndValue">
+        select bai.*, bav.id vid, bav.value_name, bav.attr_id
+        from base_attr_info bai
+                 left join base_attr_value bav
+                           on bai.id = bav.attr_id
+        where (bai.category_id = #{c1Id} and bai.category_level = 1)
+           /*动态sql*/
+           <if test="c2Id !=null  ">
+               or (bai.category_id = #{c2Id} and bai.category_level = 2)
+           </if>
+           <if test="c3Id !=null ">
+               or (bai.category_id = #{c3Id} and bai.category_level = 3)
+           </if>
+
+    </select>
+</mapper>

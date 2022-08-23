@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /*
-分类请求处理器
+    分类api
  */
 @RestController
 @RequestMapping("/admin/product")

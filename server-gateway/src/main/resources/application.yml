@@ -4,6 +4,7 @@ server:
 
 
 
+
 #配置链路追踪地址
 spring:
   zipkin:

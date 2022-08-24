@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /*
     品牌api
  */
 @RestController
-@RequestMapping("/admin/product")
+@RequestMapping("/admin/product/baseTrademark")
 public class BaseTrademarkController {
 
     @Autowired
@@ -24,7 +26,7 @@ public class BaseTrademarkController {
      * @return
      */
     //http://192.168.6.1/admin/product/baseTrademark/1/10
-    @GetMapping("/baseTrademark/{pageNum}/{pageSize}")
+    @GetMapping("/{pageNum}/{pageSize}")
     public Result baseTrademark(@PathVariable("pageNum")Long pageNum,
                                 @PathVariable("pageSize")Long pageSize){
         Page<BaseTrademark> page = new Page<>(pageNum, pageSize);
@@ -37,7 +39,7 @@ public class BaseTrademarkController {
      * @param id
      * @return
      */
-    @GetMapping("/baseTrademark/get/{id}")
+    @GetMapping("/get/{id}")
     public Result getBaseTrademark(@PathVariable("id")Long id){
         BaseTrademark trademark = baseTrademarkService.getById(id);
         return Result.ok(trademark);
@@ -48,7 +50,7 @@ public class BaseTrademarkController {
      * @param trademark
      * @return
      */
-    @PutMapping("/baseTrademark/update")
+    @PutMapping("/update")
     public Result updateBaseTrademark(@RequestBody BaseTrademark trademark){
         baseTrademarkService.updateById(trademark);
         return Result.ok();
@@ -59,7 +61,7 @@ public class BaseTrademarkController {
      * @param trademark
      * @return
      */
-    @PostMapping("/baseTrademark/save")
+    @PostMapping("/save")
     public Result saveBaseTrademark(@RequestBody BaseTrademark trademark){
         baseTrademarkService.save(trademark);
         return Result.ok();
@@ -71,9 +73,21 @@ public class BaseTrademarkController {
      * @return
      */
     //http://192.168.6.1/admin/product/baseTrademark/remove/2
-    @DeleteMapping("/baseTrademark/remove/{id}")
+    @DeleteMapping("/remove/{id}")
     public Result removeBaseTrademark(@PathVariable("id")Long id){
         baseTrademarkService.removeById(id);
         return Result.ok();
+    }
+
+    /**
+     * spu销售属性新增时查询销售属性列表
+     * @return
+     */
+    //http://192.168.6.1/admin/product/baseTrademark/getTrademarkList
+    @GetMapping("/getTrademarkList")
+    public Result getTrademarkList(){
+        //查询品牌集合
+        List<BaseTrademark> trademarkList = baseTrademarkService.list();
+        return Result.ok(trademarkList);
     }
 }

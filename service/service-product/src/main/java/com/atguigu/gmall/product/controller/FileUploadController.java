@@ -1,8 +1,9 @@
 package com.atguigu.gmall.product.controller;
 
 import com.atguigu.gmall.common.result.Result;
-import com.atguigu.gmall.product.config.MinioProperties;
+import com.atguigu.gmall.product.config.minio.MinioProperties;
 import com.atguigu.gmall.product.service.FileUploadService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * 文件上传
  */
+@Api(tags = "文件上传接口")
 @RequestMapping("/admin/product")
 @RestController
 public class FileUploadController {

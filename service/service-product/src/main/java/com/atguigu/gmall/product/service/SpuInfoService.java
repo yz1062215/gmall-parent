@@ -22,4 +22,6 @@ public interface SpuInfoService extends IService<SpuInfo> {
     List<BaseSaleAttr> getBaseSaleAttrList();
 
     List<SpuImage> getSpuImageList(Long spuId);
+
+    void saveSpuInfo(SpuInfo spuInfo);
 }

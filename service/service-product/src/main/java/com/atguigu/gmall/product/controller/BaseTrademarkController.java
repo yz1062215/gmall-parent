@@ -4,6 +4,7 @@ import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.BaseTrademark;
 import com.atguigu.gmall.product.service.BaseTrademarkService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 /*
     品牌api
  */
+@Api(tags = "品牌接口")
 @RestController
 @RequestMapping("/admin/product/baseTrademark")
 public class BaseTrademarkController {

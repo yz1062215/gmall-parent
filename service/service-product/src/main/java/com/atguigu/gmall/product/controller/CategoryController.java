@@ -7,6 +7,7 @@ import com.atguigu.gmall.model.product.BaseCategory3;
 import com.atguigu.gmall.product.service.BaseCategory1Service;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
 import com.atguigu.gmall.product.service.BaseCategory3Service;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import java.util.List;
 /*
     分类api
  */
+@Api(tags = "三级分类接口")
 @RestController
 @RequestMapping("/admin/product")
 public class CategoryController {

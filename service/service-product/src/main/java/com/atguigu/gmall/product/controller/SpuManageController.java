@@ -41,7 +41,7 @@ public class SpuManageController {
     //http://192.168.6.1/admin/product/baseSaleAttrList
 
     /**
-     * 查询spu销售属性集合
+     * 查询销售属性集合
      * @return
      */
     @GetMapping("/baseSaleAttrList")
@@ -51,18 +51,19 @@ public class SpuManageController {
     }
 
     /**
-     * 保存spu
+     * 保存spu信息
      * @param spuInfo
      * @return
      */
     @PostMapping("/saveSpuInfo")
     public Result saveSpuInfo(@RequestBody SpuInfo spuInfo){
-        spuInfoService.save(spuInfo);
+        //spu_info大保存。spu_info、spu_image、spu_sale_attr、spu_sale_attr_value
+        spuInfoService.saveSpuInfo(spuInfo);
         return Result.ok();
     }
 
     /**
-     * 查询spu属性得到图片集合
+     *  查询这个spu的所有图片
      * @param spuId
      * @return
      */
@@ -72,5 +73,5 @@ public class SpuManageController {
         List<SpuImage> spuImageList=spuInfoService.getSpuImageList(spuId);
         return Result.ok(spuImageList);
     }
-    //http://192.168.6.1/admin/product/spuSaleAttrList/27
+
 }

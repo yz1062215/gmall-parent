@@ -1,14 +1,20 @@
-package com.atguigu.gmall.product.config;
+package com.atguigu.gmall.product.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 public class AutoMinioClient {
     @Autowired
     MinioProperties minioProperties;
+
+    /**
+     * 未来想要进行文件上传的人。自动注入 MinioClient
+     * @return
+     * @throws Exception
+     */
     @Bean
     public MinioClient minioClient() throws Exception {
         //创建minio客户端

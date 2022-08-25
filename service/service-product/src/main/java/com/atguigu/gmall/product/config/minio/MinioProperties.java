@@ -1,4 +1,4 @@
-package com.atguigu.gmall.product.config;
+package com.atguigu.gmall.product.config.minio;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,6 +17,8 @@ public class MinioProperties {
       secreKey: admin123456
       bucketName: gmall
      */
+    //以前的代码一个不改，以后的代码都能用
+    //设计模式：   对新增开放，对修改关闭【开闭原则】
     String endpointUrl;
     String accessKey;
     String secreKey;

@@ -2,10 +2,7 @@ package com.atguigu.gmall.product.controller;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.product.config.MinioProperties;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import com.atguigu.gmall.product.service.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 文件上传
@@ -46,48 +42,51 @@ public class FileUploadController {
     //http://192.168.6.1/admin/product/fileUpload
     @Autowired
     MinioProperties minioProperties;
+    @Autowired
+    FileUploadService fileUploadService;
 
     @PostMapping("/fileUpload")
-    public Result fileUpload(MultipartFile file) throws Exception  {
+    public Result fileUpload(MultipartFile file){
         //TODO 品牌图片上传功能
-        String url = UploadFile(file);
+        //String url = UploadFile(file);
+        String url=fileUploadService.fileUpload(file);
         return Result.ok(url);
     }
 
-    private String UploadFile(MultipartFile file) throws Exception
-    {
-        String url="";
-        //创建minioClient对象  构建minio对象传入图片上传地址一级ak 和 sk
-        MinioClient minioClient = MinioClient.builder()
-                .endpoint(minioProperties.getEndpointUrl())
-                .credentials(minioProperties.getAccessKey(), minioProperties.getSecreKey())
-                .build();
-        //判断图片桶是否存在
-        boolean b = minioClient
-                .bucketExists(BucketExistsArgs.builder().
-                        bucket(minioProperties.getBucketName())
-                        .build());
-        if (!b){
-            //不存在
-            //创建新桶
-            minioClient.makeBucket(MakeBucketArgs.builder()
-                    .bucket(minioProperties.getBucketName())
-                    .build());
-        }
-        //定义一个随机文件名
-        String fileName=System.currentTimeMillis()+ UUID.randomUUID().toString();
-        //上传文件到桶中
-        minioClient.putObject(PutObjectArgs.builder()
-                .bucket(minioProperties.getBucketName())
-                .object(fileName)
-                .stream(file.getInputStream(), file.getSize(), -1).
-                        contentType(file.getContentType())
-                .build());
-        //获取上传成功后的文件名  minio服务器地址+同名+随机生成的文件名
-        url=minioProperties.getEndpointUrl()+"/"+minioProperties.getBucketName()+"/"+fileName;
-        System.out.println("url = " + url);
-        return url;
-    }
+    //private String UploadFile(MultipartFile file) throws Exception
+    //{
+    //    String url="";
+    //    //创建minioClient对象  构建minio对象传入图片上传地址一级ak 和 sk
+    //    MinioClient minioClient = MinioClient.builder()
+    //            .endpoint(minioProperties.getEndpointUrl())
+    //            .credentials(minioProperties.getAccessKey(), minioProperties.getSecreKey())
+    //            .build();
+    //    //判断图片桶是否存在
+    //    boolean b = minioClient
+    //            .bucketExists(BucketExistsArgs.builder().
+    //                    bucket(minioProperties.getBucketName())
+    //                    .build());
+    //    if (!b){
+    //        //不存在
+    //        //创建新桶
+    //        minioClient.makeBucket(MakeBucketArgs.builder()
+    //                .bucket(minioProperties.getBucketName())
+    //                .build());
+    //    }
+    //    //定义一个随机文件名
+    //    String fileName=System.currentTimeMillis()+ UUID.randomUUID().toString();
+    //    //上传文件到桶中
+    //    minioClient.putObject(PutObjectArgs.builder()
+    //            .bucket(minioProperties.getBucketName())
+    //            .object(fileName)
+    //            .stream(file.getInputStream(), file.getSize(), -1).
+    //                    contentType(file.getContentType())
+    //            .build());
+    //    //获取上传成功后的文件名  minio服务器地址+同名+随机生成的文件名
+    //    url=minioProperties.getEndpointUrl()+"/"+minioProperties.getBucketName()+"/"+fileName;
+    //    System.out.println("url = " + url);
+    //    return url;
+    //}
 
     //前端传参练习
     @PostMapping("/reg")

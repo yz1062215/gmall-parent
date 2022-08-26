@@ -12,7 +12,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>service-product</module>
-        <module>active-service</module>
+        <module>service-activity</module>
+        <module>web-all</module>
+        <module>service-item</module>
     </modules>
     <artifactId>service</artifactId>
 

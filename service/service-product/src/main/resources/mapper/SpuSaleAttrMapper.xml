@@ -26,6 +26,7 @@
         </collection>
 
     </resultMap>
+    <!--查询某个sku对应的属性名和值-->
     <select id="getspuSaleAttrListBySpuId" resultMap="SaleAttrNameAndValueRM">
         SELECT ssa.*,
                ssav.`id` vid,
@@ -36,6 +37,23 @@
                                AND
                               ssa.`base_sale_attr_id` = ssav.`base_sale_attr_id`
         WHERE ssa.spu_id = #{spuId}
+
+    </select>
+
+    <!--查询出某个sku对应的spu自定义的所有销售属性的名和值 并标记当前sku是哪个组合-->
+    <select id="getSaleAttrAndValueAndMarkSkuBySpuId" resultMap="SaleAttrNameAndValueRM">
+        SELECT ssa.*,
+               ssav.id                                     vid,
+               ssav.`sale_attr_value_name`,
+               IF(sale_attr_value_id IS NULL, '0', '1') AS is_checked
+        FROM spu_sale_attr ssa
+                 LEFT JOIN spu_sale_attr_value ssav
+                           ON ssa.`spu_id` = ssav.`spu_id` AND
+                              ssa.`base_sale_attr_id` = ssav.`base_sale_attr_id`
+                 LEFT JOIN sku_sale_attr_value skuv
+                           ON ssav.`id` = skuv.`sale_attr_value_id` AND skuv.`sku_id` = #{skuId}
+        WHERE ssa.`spu_id` = #{spuId}
+        ORDER BY ssa.`id`, ssav.`id`;
 
     </select>
 </mapper>

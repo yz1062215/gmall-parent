@@ -18,4 +18,15 @@ public interface SpuSaleAttrService extends IService<SpuSaleAttr> {
      * @return
      */
     List<SpuSaleAttr> spuSaleAttrList(Long spuId);
+
+    /**
+     * 根据spuId skuId查询所有属性名和值 并标记出来
+     * @param spuId
+     * @param skuId
+     * @return
+     */
+    List<SpuSaleAttr> getSaleAttrAndValueAndMarkSkuBySpuId(Long spuId, Long skuId);
+
+
+
 }

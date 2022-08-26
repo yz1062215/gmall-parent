@@ -37,14 +37,19 @@
         from base_attr_info bai
                  left join base_attr_value bav
                            on bai.id = bav.attr_id
-        where (bai.category_id = #{c1Id} and bai.category_level = 1)
-           /*动态sql*/
-           <if test="c2Id !=null  ">
-               or (bai.category_id = #{c2Id} and bai.category_level = 2)
-           </if>
-           <if test="c3Id !=null ">
-               or (bai.category_id = #{c3Id} and bai.category_level = 3)
-           </if>
+        <where>
+            /*动态sql*/
+            <if test="c1Id !=0">
+                (bai.category_id = #{c1Id} and bai.category_level = 1)
+            </if>
+            <if test="c2Id !=0  ">
+                or (bai.category_id = #{c2Id} and bai.category_level = 2)
+            </if>
+            <if test="c3Id !=0 ">
+                or (bai.category_id = #{c3Id} and bai.category_level = 3)
+            </if>
+        </where>
+
 
     </select>
 </mapper>

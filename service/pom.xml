@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>service-product</module>
+        <module>active-service</module>
     </modules>
     <artifactId>service</artifactId>
 
@@ -70,12 +71,12 @@
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
 
-        <!--开发者工具-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-        </dependency>
+        <!--开发者工具   热部署-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-devtools</artifactId>-->
+<!--            <optional>true</optional>-->
+<!--        </dependency>-->
 
         <!--链路追踪-->
         <dependency>

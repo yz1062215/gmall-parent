@@ -53,7 +53,25 @@
                  LEFT JOIN sku_sale_attr_value skuv
                            ON ssav.`id` = skuv.`sale_attr_value_id` AND skuv.`sku_id` = #{skuId}
         WHERE ssa.`spu_id` = #{spuId}
-        ORDER BY ssa.`id`, ssav.`id`;
+        ORDER BY ssa.`base_sale_attr_id`, ssav.`id`;
+
+    </select>
+
+    <!--复杂sql不能高并发  高并发不能复杂sql-->
+    <select id="getAllSkuValueJson" resultType="com.atguigu.gmall.model.to.ValueSkuJsonTo">
+        SELECT a.sku_id,
+               GROUP_CONCAT(DISTINCT sale_attr_value_id ORDER BY sale_attr_value_id SEPARATOR '|')
+                   AS value_json
+        FROM (SELECT si.`id` sku_id,
+                     skuav.`spu_id`,
+                     skuav.`sale_attr_value_id`,
+                     spuav.`base_sale_attr_id`
+              FROM sku_info si
+                       LEFT JOIN sku_sale_attr_value skuav ON si.`id` = skuav.`sku_id`
+                       LEFT JOIN spu_sale_attr_value spuav ON skuav.`sale_attr_value_id` = spuav.`id`
+              WHERE si.`spu_id` = #{spuId}
+              ORDER BY si.`id`, spuav.`base_sale_attr_id`, skuav.`sale_attr_value_id`) a
+        GROUP BY a.sku_id
 
     </select>
 </mapper>

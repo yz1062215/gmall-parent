@@ -27,6 +27,10 @@ public interface SpuSaleAttrService extends IService<SpuSaleAttr> {
      */
     List<SpuSaleAttr> getSaleAttrAndValueAndMarkSkuBySpuId(Long spuId, Long skuId);
 
-
-
+    /**
+     * 查询所有sku销售属性的组合可能 并且封装成前段需要的json
+     * @param spuId
+     * @return
+     */
+    String getAllSkuSaleValueJson(Long spuId);
 }

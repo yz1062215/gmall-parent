@@ -126,6 +126,29 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         //根据spuId和skuId查询
         List<SpuSaleAttr> saleAttrList=spuSaleAttrService.getSaleAttrAndValueAndMarkSkuBySpuId(skuInfo.getSpuId(),skuId);
         detailTo.setSpuSaleAttrList(saleAttrList);
+
+        //获取sku的所有兄弟产品的销售名和值组合关系
+        /*
+        SELECT a.sku_id,
+            GROUP_CONCAT(DISTINCT sale_attr_value_id ORDER BY sale_attr_value_id SEPARATOR '|')
+            AS value_json
+            FROM
+            (SELECT si.`id` sku_id,
+            skuav.`spu_id`,
+            skuav.`sale_attr_value_id`,
+            spuav.`base_sale_attr_id`
+             FROM sku_info si
+            LEFT JOIN sku_sale_attr_value skuav ON si.`id`=skuav.`sku_id`
+            LEFT JOIN spu_sale_attr_value spuav ON skuav.`sale_attr_value_id`=spuav.`id`
+            WHERE si.`spu_id`=27 ORDER BY si.`id`,spuav.`base_sale_attr_id`,skuav.`sale_attr_value_id`) a
+            GROUP BY a.sku_id
+         */
+        //传入spu_id
+        Long spuId = skuInfo.getSpuId();
+        String valueJson =spuSaleAttrService.getAllSkuSaleValueJson(spuId);
+        detailTo.setValuesSkuJson(valueJson);
+
+
         //5.商品sku的类似推荐
         //6.商品介绍 规格参数 售后评论....
         return detailTo;

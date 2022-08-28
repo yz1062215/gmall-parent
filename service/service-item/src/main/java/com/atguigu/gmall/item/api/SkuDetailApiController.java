@@ -25,7 +25,6 @@ public class SkuDetailApiController {
     @GetMapping("/sukdetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         SkuDetailTo skuDetailTo = skuDetailService.getSkuDetail(skuId);
-
         return Result.ok(skuDetailTo);
     }
 }

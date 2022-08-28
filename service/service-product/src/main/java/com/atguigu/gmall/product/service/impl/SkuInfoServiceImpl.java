@@ -104,6 +104,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
      */
     @Resource
     BaseCategory3Mapper baseCategory3Mapper;
+
+
+    @Deprecated//过期方法
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
 
@@ -158,6 +161,28 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
     public BigDecimal getSku101Price(Long skuId) {
         BigDecimal price=skuInfoMapper.get101Price(skuId);
         return price;
+    }
+
+    /**
+     * //1.查询skuinfo
+     * @param skuId
+     * @return
+     */
+    @Override
+    public SkuInfo getDetailSkuInfo(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);//获取商品详情
+        return skuInfo;
+    }
+
+    /**
+     * 2.查询sku商品图片集合
+     * @param skuId
+     * @return
+     */
+    @Override
+    public List<SkuImage> getDetailSkuImages(Long skuId) {
+        List<SkuImage> imageList= skuImageService.getSkuImage(skuId);
+        return imageList;
     }
 }
 

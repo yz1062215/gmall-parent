@@ -2,6 +2,7 @@ package com.atguigu.gmall.product.service;
 
 
 import com.atguigu.gmall.model.product.BaseCategory3;
+import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -18,4 +19,11 @@ public interface BaseCategory3Service extends IService<BaseCategory3> {
      * @return
      */
     List<BaseCategory3> getCategory2Child(Long c2Id);
+
+    /**
+     * 查询三级分类对应的详细分类信息
+     * @param c3Id
+     * @return
+     */
+    CategoryViewTo getCategoryView(Long c3Id);
 }

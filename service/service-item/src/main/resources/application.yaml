@@ -1,0 +1,26 @@
+server:
+  port: 9001
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  redis:
+    host: 192.168.6.152
+    password: yz123456..
+  zipkin:
+    base-url: http://192.168.6.152:9411/
+    sender:
+      type: web
+app:
+  thread-pool:
+    core: 4
+    max: 8
+    queue-size: 2000
+    keep-alive-time: 300
+
+
+#暴露所有监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

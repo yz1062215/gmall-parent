@@ -1,6 +1,7 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -8,7 +9,9 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SkuDetailServiceImpl implements SkuDetailService {
@@ -23,8 +27,36 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     SkuDetailFeignClient skuDetailFeignClient;
     @Autowired
     ThreadPoolExecutor executor;
+    @Autowired
+    StringRedisTemplate redisTemplate;
+    //未使用redis
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
+        //1.看缓存中有无 sku:info:49
+        String jsonStr = redisTemplate.opsForValue().get("sku:info:" + skuId);
+        if (StringUtils.isEmpty(jsonStr)){
+            //2.redis无缓存
+            //回源
+            SkuDetailTo fromRpc = getSkuDetailFromRpc(skuId);
+            //存入缓存
+            String cacheJson="x";
+            //缓存穿透问题
+            //空值缓存+布隆过滤器(占位)
+            if (fromRpc!=null){
+                cacheJson=Jsons.toStr(fromRpc);
+                redisTemplate.opsForValue().set("sku:info:"+skuId,cacheJson,7, TimeUnit.DAYS);//如果成功查询到则存入缓存中 过期时间设为七天
+            }else {
+                redisTemplate.opsForValue().set("sku:info:"+skuId,cacheJson,30, TimeUnit.MINUTES);//远程查询为空
+            }
+
+            return fromRpc;
+        }
+        //3.如果缓存中存在
+        SkuDetailTo skuDetailTo=Jsons.toObj(jsonStr,SkuDetailTo.class);
+        return skuDetailTo;
+    }
+
+    private SkuDetailTo getSkuDetailFromRpc(Long skuId) {
         SkuDetailTo detailTo = new SkuDetailTo();
         CountDownLatch downLatch = new CountDownLatch(6);//异步编排
         //远程调用service-product服务
@@ -85,4 +117,6 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         //6.商品介绍 规格参数 售后评论....
         return detailTo;
     }
+
+
 }

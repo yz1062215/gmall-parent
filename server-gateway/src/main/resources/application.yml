@@ -30,6 +30,12 @@ spring:
           uri: lb://service-activity
           predicates:  #断言
             - Path=/admin/activity/**
+
+        - id: incr_route
+          uri: lb://service-item
+          predicates:  #断言
+            - Path=/lock/incr
+
         - id: web_all_route
           uri: lb://web-all
           predicates:  #断言

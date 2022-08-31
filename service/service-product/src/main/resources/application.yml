@@ -10,6 +10,9 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: 192.168.6.152
+    password: yz123456..
 
 # minio配置
 minio:

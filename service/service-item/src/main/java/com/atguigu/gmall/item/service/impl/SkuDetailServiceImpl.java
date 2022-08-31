@@ -273,7 +273,8 @@ public class SkuDetailServiceImpl implements SkuDetailService {
                 }
 
             }
-            //没有
+            //布隆过滤器判断没有
+            log.info("[{}] 商品 布隆过滤器判断没有........存在隐藏的攻击风险" + skuId);
             return null;
         }
         //4.缓存有

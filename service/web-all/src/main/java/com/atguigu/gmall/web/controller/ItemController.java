@@ -39,7 +39,7 @@ public class ItemController {
         if (result.isOk()) {
             //调用成功
             SkuDetailTo skuDetailTo = result.getData();
-            if (skuDetailTo.getSkuInfo()==null){
+            if (skuDetailTo==null||skuDetailTo.getSkuInfo()==null){
                 //说明远程未查到商品
                 return "item/404";
             }

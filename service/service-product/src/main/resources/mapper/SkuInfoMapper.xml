@@ -36,4 +36,9 @@
         where id = #{skuId}
     </select>
 
+    <!--布隆过滤器查询出所有商品id-->
+    <select id="getAllSkuId" resultType="java.lang.Long">
+        select id from sku_info
+    </select>
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product;
 
+import com.atguigu.gmall.common.annotation.EnableRedisson;
 import com.atguigu.gmall.common.annotation.EnableThreadPool;
 import com.atguigu.gmall.common.config.Swagger2Config;
 import org.mybatis.spring.annotation.MapperScan;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 @MapperScan("com.atguigu.gmall.product.mapper")
 @Import({Swagger2Config.class})
 @EnableThreadPool
+@EnableRedisson
 public class ProductMainApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductMainApplication.class,args);

@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.service.impl;
 
 
+import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -8,6 +9,8 @@ import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
 import com.atguigu.gmall.product.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Autowired
     SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    RedissonClient redissonClient;
 
     @Resource
     SkuInfoMapper skuInfoMapper;
@@ -69,6 +74,10 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         }
         skuSaleAttrValueService.saveBatch(saleAttrValueList);
 
+        //TODO  新增一个商品 将这个商品的skuID放到布隆过滤器
+        RBloomFilter<Object> filter = redissonClient.getBloomFilter(SysRedisConst.BLOOM_SKUID);
+        filter.add(skuId);
+
     }
     //下架
 
@@ -104,6 +113,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
      */
     @Resource
     BaseCategory3Mapper baseCategory3Mapper;
+
 
 
     @Deprecated//过期方法
@@ -183,6 +193,14 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
     public List<SkuImage> getDetailSkuImages(Long skuId) {
         List<SkuImage> imageList= skuImageService.getSkuImage(skuId);
         return imageList;
+    }
+
+    @Override
+    public List<Long> findAllSkuId() {
+
+        //查询出所有id
+        List<Long> ids = skuInfoMapper.getAllSkuId();
+        return ids ;
     }
 }
 

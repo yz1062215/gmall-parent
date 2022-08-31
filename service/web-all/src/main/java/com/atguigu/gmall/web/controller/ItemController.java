@@ -25,7 +25,7 @@ public class ItemController {
      */
     @GetMapping("/{skuId}.html")
     public String item(@PathVariable("skuId") Long skuId, Model model) {
-
+        //高并发 高性能 高可用（分布式锁+布隆过滤器）
         //远程调用查询商品详细信息
         Result<SkuDetailTo> result = skuDetailFeignClient.getSkuDetail(skuId);
         //1.商品(sku)所属的完整分类

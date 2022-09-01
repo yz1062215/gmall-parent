@@ -10,7 +10,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,14 +44,46 @@ public class CacheOpsServiceImpl implements CacheOpsService {
     }
 
     @Override
-    public boolean bloomContains(Long skuId) {
+    public Object getCacheData(String cacheKey, Type type) {
+        String jsonStr = redisTemplate.opsForValue().get(cacheKey);
+        //引入null值缓存机制。
+        if(SysRedisConst.NULL_VALUE.equals(jsonStr)){
+            return null;
+        }
+
+        //逆转json为Type类型的复杂对象
+        //逆转json为Type类型的复杂对象
+        Object obj = Jsons.toObj(jsonStr, new TypeReference<Object>() {
+            @Override
+            public Type getType() {
+                return type; //这个是方法的带泛型的返回值类型
+            }
+        });
+        return obj;
+    }
+
+    @Override
+    public boolean bloomContains(Object skuId) {
         RBloomFilter<Object> filter = redissonClient.getBloomFilter(SysRedisConst.BLOOM_SKUID);
         boolean contains = filter.contains(skuId);
         return contains;
     }
 
     @Override
-    public boolean lock(Long skuId) {
+    public boolean bloomContains(String bloomName, Object bVal) {
+        RBloomFilter<Object> filter = redissonClient.getBloomFilter(bloomName);
+        return filter.contains(bVal);
+    }
+
+
+    @Override
+    public boolean tryLock(String lockName) {
+        RLock rLock = redissonClient.getLock(lockName);
+        return rLock.tryLock();
+    }
+
+    @Override
+    public boolean tryLock(Long skuId) {
         //定义锁用的key
         String lockKey=SysRedisConst.LOCK_SKU_DETAIL+skuId;
         RLock lock = redissonClient.getLock(lockKey);
@@ -83,5 +116,11 @@ public class CacheOpsServiceImpl implements CacheOpsService {
 
         //解锁
         lock.unlock();
+    }
+
+    @Override
+    public void unlock(String lockName) {
+        RLock lock = redissonClient.getLock(lockName);
+        lock.unlock(); //redisson已经防止了删别人锁
     }
 }

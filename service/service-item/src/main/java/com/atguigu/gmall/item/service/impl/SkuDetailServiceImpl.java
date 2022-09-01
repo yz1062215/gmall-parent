@@ -2,6 +2,7 @@ package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.item.annotation.GmallCache;
 import com.atguigu.gmall.item.cache.CacheOpsService;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
@@ -242,8 +243,7 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     //分布式锁最终实现
     @Autowired
     CacheOpsService cacheOpsService;
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {//先查缓存 再查布隆
+    public SkuDetailTo getSkuDetailWithCache(Long skuId) {//先查缓存 再查布隆
         String cacheKey= SysRedisConst.SKU_INFO_PREFIX +skuId;
         //1.先查缓存中有没有
         SkuDetailTo cacheData=cacheOpsService.getCacheData(cacheKey,SkuDetailTo.class);
@@ -254,7 +254,7 @@ public class SkuDetailServiceImpl implements SkuDetailService {
             boolean contain=cacheOpsService.bloomContains(skuId);
             if (contain){
                 //布隆说有   可能有
-                boolean lock=cacheOpsService.lock(skuId);//为当前商品加自己的分布式锁
+                boolean lock=cacheOpsService.tryLock(skuId);//为当前商品加自己的分布式锁
                 if (lock){
                     //获取锁成功 查询远程
                     //System.out.println("回源..............");
@@ -280,5 +280,23 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         //4.缓存有
         return  cacheData;
 
+    }
+
+
+    /**
+     * AOP优化
+     * @param skuId
+     * @return
+     */
+    @GmallCache(
+            cacheKey =SysRedisConst.SKU_INFO_PREFIX+"#{#params[0]}",
+            bloomName = SysRedisConst.BLOOM_SKUID,
+            bloomValue = "#{#params[0]}",
+            lockName = SysRedisConst.LOCK_SKU_DETAIL+"#{#params[0]}"
+    )
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        SkuDetailTo fromRpc = getSkuDetailFromRpc(skuId);
+        return fromRpc;
     }
 }

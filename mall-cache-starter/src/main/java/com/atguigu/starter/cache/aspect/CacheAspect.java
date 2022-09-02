@@ -1,10 +1,9 @@
-package com.atguigu.gmall.item.aspect;
+package com.atguigu.starter.cache.aspect;
 
-import com.alibaba.cloud.commons.lang.StringUtils;
-import com.atguigu.gmall.common.constant.SysRedisConst;
-import com.atguigu.gmall.item.annotation.GmallCache;
-import com.atguigu.gmall.item.cache.CacheOpsService;
-import com.atguigu.gmall.model.to.SkuDetailTo;
+
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.constant.SysRedisConst;
+import com.atguigu.starter.cache.service.CacheOpsService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +16,7 @@ import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -41,7 +41,7 @@ public class CacheAspect {
     @Autowired
     CacheOpsService cacheOpsService;
 
-    @Around("@annotation(com.atguigu.gmall.item.annotation.GmallCache)")
+    @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = null;
         Object arg = joinPoint.getArgs()[0];
@@ -58,6 +58,7 @@ public class CacheAspect {
         if (cacheData == null) {
             //缓存没有  回源
             //问布隆有无当前商品id
+            //TODO 决定锁名   锁名=
             String bloomName = determinBloomName(joinPoint);
             if(!StringUtils.isEmpty(bloomName)){
                 //指定开启了布隆
@@ -86,7 +87,7 @@ public class CacheAspect {
                 } else {
                     //没拿到锁 睡眠1S查缓存
                     Thread.sleep(10000);
-                    return cacheOpsService.getCacheData(cacheKey, SkuDetailTo.class);
+                    return cacheOpsService.getCacheData(cacheKey, returnType);
                 }
             } finally {
                 //解锁操作  加上锁之后才执行解锁操作
@@ -244,7 +245,6 @@ public class CacheAspect {
             //没指定锁用方法级别的锁
             return SysRedisConst.LOCK_PREFIX+method.getName();
         }
-
         //4、计算锁值
         String lockNameVal = evaluationExpression(lockName, joinPoint, String.class);
         return lockNameVal;

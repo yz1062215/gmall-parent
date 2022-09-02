@@ -1,4 +1,4 @@
-package com.atguigu.gmall.item.annotation;
+package com.atguigu.starter.cache.annotation;
 
 import java.lang.annotation.*;
 

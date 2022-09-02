@@ -1,8 +1,8 @@
 package com.atguigu.gmall.web.controller;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.feign.product.CategoryFeignClient;
 import com.atguigu.gmall.model.to.CategoryTreeTo;
-import com.atguigu.gmall.web.feign.CategoryFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +27,7 @@ public class IndexController {
 
         //查询所有菜单
         //远程调用product服务查询所有菜单封装为一个树形结构模型..
-        Result<List<CategoryTreeTo>> categoryTree = categoryFeignClient.getCategoryTree();
+        Result<List<CategoryTreeTo>> categoryTree = categoryFeignClient.getAllCategoryWithTree();
         //判断是否调用成功
         if (categoryTree.isOk()){
             //调用成功

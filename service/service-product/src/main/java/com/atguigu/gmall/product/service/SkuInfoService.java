@@ -36,4 +36,10 @@ public interface SkuInfoService extends IService<SkuInfo> {
     List<SkuImage> getDetailSkuImages(Long skuId);
 
     List<Long> findAllSkuId();
+
+    /**
+     * 修改商品属性 延时双删缓存
+     * @param skuInfo
+     */
+    void updateSkuInfo(SkuInfo skuInfo);
 }

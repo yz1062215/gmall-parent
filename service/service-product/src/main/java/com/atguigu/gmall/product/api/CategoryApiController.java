@@ -25,6 +25,12 @@ public class CategoryApiController {
     @GetMapping("/category/tree")
     public Result getAllCategoryWithTree(){
         List<CategoryTreeTo> categoryTreeTos=baseCategory2Service.getAllCategoryWithTree();
+
+        //try {
+        //    Thread.sleep(5000);
+        //} catch (InterruptedException e) {
+        //    throw new RuntimeException(e);
+        //}
         return Result.ok(categoryTreeTos);
     }
 }

@@ -8,6 +8,8 @@ import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
 import com.atguigu.gmall.product.service.*;
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.service.CacheOpsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
@@ -42,6 +44,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
     SkuInfoMapper skuInfoMapper;
     @Autowired
     SpuSaleAttrService spuSaleAttrService;
+
 
     /**
      * sku大保存
@@ -201,6 +204,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         //查询出所有id
         List<Long> ids = skuInfoMapper.getAllSkuId();
         return ids ;
+    }
+
+
+    @Autowired
+    CacheOpsService cacheOpsService;
+    @GmallCache
+    @Override
+    public void updateSkuInfo(SkuInfo skuInfo) {
+        skuInfoMapper.update(skuInfo, null);
+        cacheOpsService.delay2Delete(skuInfo.getId().toString());
     }
 }
 

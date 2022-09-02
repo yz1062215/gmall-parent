@@ -1,6 +1,5 @@
 package com.atguigu.gmall.product;
 
-import com.atguigu.gmall.common.annotation.EnableRedisson;
 import com.atguigu.gmall.common.annotation.EnableThreadPool;
 import com.atguigu.gmall.common.config.Swagger2Config;
 import org.mybatis.spring.annotation.MapperScan;
@@ -13,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan("com.atguigu.gmall.product.mapper")
 @Import({Swagger2Config.class})
 @EnableThreadPool
-@EnableRedisson
+//@EnableRedisson
 @EnableScheduling//开启定时任务重构布隆过滤器
 public class ProductMainApplication {
     public static void main(String[] args) {

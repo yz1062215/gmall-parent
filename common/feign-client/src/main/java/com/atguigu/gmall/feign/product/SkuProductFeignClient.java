@@ -1,4 +1,4 @@
-package com.atguigu.gmall.item.feign;
+package com.atguigu.gmall.feign.product;
 
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -13,66 +13,66 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.math.BigDecimal;
 import java.util.List;
 
+
 @RequestMapping("/api/inner/rpc/product")
 @FeignClient("service-product")
-public interface SkuDetailFeignClient {
+public interface SkuProductFeignClient {
 
-    //v1
-    //@GetMapping("/skudetail/{skuId}")
-    //public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
+//    @GetMapping("/skudetail/{skuId}")  //不要用这个超级接口
+//    Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
 
     /**
      * 查询sku的基本信息
-     *
      * @param skuId
      * @return
      */
     @GetMapping("/skudetail/info/{skuId}")
     Result<SkuInfo> getSkuInfo(@PathVariable("skuId") Long skuId);
 
-    /**
-     * 查询sku的详细分类
-     *
-     * @param c3Id
-     * @return
-     */
-    @GetMapping("/skudetail/categoryview/{c3Id}")
-    Result<CategoryViewTo> getcategory(@PathVariable("c3Id") Long c3Id);
 
     /**
-     * 查询sku所有图片
-     *
+     * 查询sku的图片信息
      * @param skuId
      * @return
      */
     @GetMapping("/skudetail/images/{skuId}")
-    Result<List<SkuImage>> getSkuImages(@PathVariable("skuId") Long skuId);
+    Result<List<SkuImage>> getSkuImages(@PathVariable("skuId")Long skuId);
+
 
     /**
-     * 获取sku的实时价格
-     *
+     * 查询sku的实时价格
      * @param skuId
      * @return
      */
     @GetMapping("/skudetail/price/{skuId}")
-    Result<BigDecimal> getSku101Price(@PathVariable("skuId") Long skuId);
+    Result<BigDecimal> getSku101Price(@PathVariable("skuId")Long skuId);
 
     /**
-     * 查询sku对应的spu定义的所有销售属性名和值 并标记
-     *
+     * 查询sku对应的spu定义的所有销售属性名和值。并且标记出当前sku是哪个
      * @param skuId
      * @param spuId
      * @return
      */
     @GetMapping("/skudetail/saleAttrValues/{skuId}/{spuId}")
-    Result<List<SpuSaleAttr>> getsaleAttrValues(@PathVariable("skuId") Long skuId, @PathVariable("spuId") Long spuId);
+    public Result<List<SpuSaleAttr>> getsaleAttrValues(@PathVariable("skuId") Long skuId,
+                                                       @PathVariable("spuId") Long spuId);
+
 
     /**
-     * 查询sku所有组合
-     *
+     * 查sku组合 valueJson
      * @param spuId
      * @return
      */
     @GetMapping("/skudetail/valuejson/{spuId}")
-    Result<String> getSkuValueJson(@PathVariable("spuId") Long spuId);
+    public Result<String> getSkuValueJson(@PathVariable("spuId")Long spuId);
+
+
+    /**
+     * 查分类
+     * @param c3Id
+     * @return
+     */
+    @GetMapping("/skudetail/categoryview/{c3Id}")
+    public Result<CategoryViewTo> getcategory(@PathVariable("c3Id") Long c3Id);
+
 }

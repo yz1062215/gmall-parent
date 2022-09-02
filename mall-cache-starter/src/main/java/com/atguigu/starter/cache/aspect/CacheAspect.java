@@ -44,7 +44,7 @@ public class CacheAspect {
     @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = null;
-        Object arg = joinPoint.getArgs()[0];
+        //Object args=joinPoint.getArgs();
 
         //TODO key 不同 方法不同
         //String cacheKey = SysRedisConst.SKU_INFO_PREFIX + arg;
@@ -82,7 +82,8 @@ public class CacheAspect {
                     //调用目标方法
                     result = joinPoint.proceed(joinPoint.getArgs());
                     //调用成功  重新保存到缓存
-                    cacheOpsService.saveData(cacheKey, result);
+                    long ttl=detdeterminTtl(joinPoint);
+                    cacheOpsService.saveData(cacheKey, result,ttl);
                     return result;
                 } else {
                     //没拿到锁 睡眠1S查缓存
@@ -130,6 +131,17 @@ public class CacheAspect {
         //    //后置通知
         //    return result;//可以自定义返回值
         //}
+    }
+
+    private long detdeterminTtl(ProceedingJoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+
+        Method method = signature.getMethod();
+        GmallCache annotation = method.getDeclaredAnnotation(GmallCache.class);
+        long ttl = annotation.ttl();
+
+        return ttl;
+
     }
 
     /**

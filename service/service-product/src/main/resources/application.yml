@@ -1,18 +1,28 @@
 server:
   port: 7000
 spring:
-  zipkin:
-    base-url: http://192.168.6.152:9411/
-    sender:
-      type: web
+  profiles:
+    include: shardingsphere
+#  zipkin:
+#    base-url: http://192.168.6.152:9411/
+#    sender:
+#      type: web
   datasource:
     url: jdbc:mysql://192.168.6.152:3306/gmall_product?useSSL=false&characterEncoding=utf-8
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
-  redis:
-    host: 192.168.6.152
-    password: yz123456..
+
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 500  #连接超时时间
+        read-timeout: 5000 #读超时时间
+        retryer: com.atguigu.gmall.product.retry.MyRetry
+#  redis:
+#    host: 192.168.6.152
+#    password: yz123456..
 
 # minio配置
 minio:
@@ -21,15 +31,16 @@ minio:
   secreKey: admin123456
   bucketName: gmall
 #mybatis日志
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 app:
   thread-pool:
     core: 4
     max: 8
     queue-size: 2000
     keep-alive-time: 300
+
 
 
 

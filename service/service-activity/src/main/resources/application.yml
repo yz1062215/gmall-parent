@@ -1,10 +1,10 @@
 server:
   port: 8000
 spring:
-  zipkin:
-    base-url: http://192.168.6.152:9411/
-    sender:
-      type: web
+#  zipkin:
+#    base-url: http://192.168.6.152:9411/
+#    sender:
+#      type: web
   datasource:
     url: jdbc:mysql://192.168.6.152:3306/gmall_activity?useSSL=false&characterEncoding=utf-8
     username: root

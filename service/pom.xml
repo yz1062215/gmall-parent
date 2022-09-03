@@ -15,6 +15,7 @@
         <module>service-activity</module>
         <module>web-all</module>
         <module>service-item</module>
+        <module>service-search</module>
     </modules>
     <artifactId>service</artifactId>
 
@@ -74,11 +75,11 @@
         </dependency>
 
         <!--开发者工具   热部署-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-devtools</artifactId>-->
+        <!--            <optional>true</optional>-->
+        <!--        </dependency>-->
 
         <!--链路追踪-->
         <dependency>
@@ -86,9 +87,12 @@
             <artifactId>spring-cloud-starter-zipkin</artifactId>
         </dependency>
 
-
-
-
+        <!--fei-client-->
+        <dependency>
+            <groupId>com.atguigu.gmall</groupId>
+            <artifactId>feign-client</artifactId>
+            <version>1.0</version>
+        </dependency>
 
     </dependencies>
 

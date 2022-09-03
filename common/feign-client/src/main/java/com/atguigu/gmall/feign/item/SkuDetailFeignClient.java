@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient("service-item")
 public interface SkuDetailFeignClient {
 
-    @GetMapping("/skudetail/{skuId}")
-    Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId")Long skuId);
+    @GetMapping("/sukdetail/{skuId}")
+    public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId);
 }

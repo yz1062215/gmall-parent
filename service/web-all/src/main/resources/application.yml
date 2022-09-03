@@ -6,10 +6,10 @@ spring:
     allow-bean-definition-overriding: true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  zipkin:
-    base-url: http://192.168.6.152:9411/
-    sender:
-      type: web
+#  zipkin:
+#    base-url: http://192.168.6.152:9411/
+#    sender:
+#      type: web
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

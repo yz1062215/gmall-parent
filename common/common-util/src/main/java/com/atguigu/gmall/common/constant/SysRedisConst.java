@@ -10,4 +10,5 @@ public class SysRedisConst {
     public static final String BLOOM_SKUID = "bloom:skuid";
     public static final String LOCK_PREFIX = "lock:";
     public static final String CACHE_CATEGORYS = "categorys";
+    public static final int SEARCH_PAGESIZE = 8;
 }

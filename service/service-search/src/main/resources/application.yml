@@ -6,3 +6,8 @@ spring:
   elasticsearch:
     rest:
       uris: http://192.168.6.152:9200
+logging:
+  level:
+    tracer: trace
+#    com.atguigu.gmall: trace
+    org.elasticsearch: trace

@@ -10,12 +10,14 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -121,6 +123,9 @@ public class GoodsServiceImpl implements GoodsService {
         }
 
 
+        //检索条件结束..............
+
+
         //准备原生检索条件
         NativeSearchQuery query = new NativeSearchQuery(boolQuery);
 
@@ -162,6 +167,17 @@ public class GoodsServiceImpl implements GoodsService {
             query.setPageable(pageRequest);
 
         //}
+        //排序分页结束................
+
+
+        //高亮检索
+        if (!StringUtils.isEmpty(paramVo.getKeyword())){
+            HighlightBuilder highlightBuilder = new HighlightBuilder();
+            highlightBuilder.field("title").preTags("<span style='color:red'>").postTags("</span>");
+            HighlightQuery highlightQuery = new HighlightQuery(highlightBuilder);
+            query.setHighlightQuery(highlightQuery);
+        }
+        //模糊查询高亮结束..............
 
 
 

@@ -15,7 +15,8 @@ public class SearchTest {
     public void Test01(){
 
         SearchParamVo vo = new SearchParamVo();
-        vo.setCategory3Id(61L);
+        //vo.setCategory3Id(61L);
+        vo.setKeyword("小米");
         goodsService.search(vo);
     }
 }

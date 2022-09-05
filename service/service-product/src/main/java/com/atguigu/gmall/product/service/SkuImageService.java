@@ -18,4 +18,6 @@ public interface SkuImageService extends IService<SkuImage> {
      * @return
      */
     List<SkuImage> getSkuImage(Long skuId);
+
+
 }

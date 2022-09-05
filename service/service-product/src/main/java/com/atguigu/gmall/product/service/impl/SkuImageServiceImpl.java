@@ -28,6 +28,8 @@ public class SkuImageServiceImpl extends ServiceImpl<SkuImageMapper, SkuImage> i
 
         return skuImageMapper.selectList(imageWrapper);
     }
+
+
 }
 
 

@@ -1,7 +1,9 @@
 package com.atguigu.gmall.product.service.impl;
 
-
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
+import com.atguigu.gmall.model.list.Goods;
+import com.atguigu.gmall.model.list.SearchAttr;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,6 +51,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     /**
      * sku大保存
+     *
      * @param info
      */
     @Transactional//开启事务
@@ -86,19 +90,24 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     /**
      * 下架
+     *
      * @param skuId
      */
     @Override
     public void cancelSale(Long skuId) {
         //修改sku_info表中的is_sale
-        skuInfoMapper.updateIsSale(skuId,0);
+        skuInfoMapper.updateIsSale(skuId, 0);
 
         //TODO es中删除该数据
+        searchFeignClient.delGoods(skuId);
     }
     //上架
+    @Autowired
+    SearchFeignClient searchFeignClient;
 
     /**
      * 上架
+     *
      * @param skuId
      */
     @Override
@@ -106,17 +115,19 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         skuInfoMapper.updateIsSale(skuId, 1);
 
         //TODO es中新增该数据
+        Goods goods = getGoodsBySkuId(skuId);
+        searchFeignClient.saveGoods(goods);
+
     }
 
     /**
-     *
      * 获取sku商品详情....
+     *
      * @param skuId
      * @return
      */
     @Resource
     BaseCategory3Mapper baseCategory3Mapper;
-
 
 
     @Deprecated//过期方法
@@ -127,20 +138,20 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         SkuDetailTo detailTo = new SkuDetailTo();
         SkuInfo skuInfo = skuInfoMapper.selectById(skuId);//获取商品详情
         //1.1根据三级分类id获取完整分类信息并封装到CategoryViewTo 中
-        CategoryViewTo categoryViewTo=baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
+        CategoryViewTo categoryViewTo = baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
         detailTo.setCategoryView(categoryViewTo);
 
         //TODO √  2.商品(sku)的基本信息
         detailTo.setSkuInfo(skuInfo);
         //TODO √   3.sku图片
-        List<SkuImage> imageList= skuImageService.getSkuImage(skuId);
+        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
         skuInfo.setSkuImageList(imageList);
 
         //实时价格查询
         detailTo.setPrice(getSku101Price(skuId));
         //4.sku所属的spu的所有销售属性值   标识出当前sku到底是spu下的哪种组合  对该种组合高亮提示
         //根据spuId和skuId查询
-        List<SpuSaleAttr> saleAttrList=spuSaleAttrService.getSaleAttrAndValueAndMarkSkuBySpuId(skuInfo.getSpuId(),skuId);
+        List<SpuSaleAttr> saleAttrList = spuSaleAttrService.getSaleAttrAndValueAndMarkSkuBySpuId(skuInfo.getSpuId(), skuId);
         detailTo.setSpuSaleAttrList(saleAttrList);
 
         //获取sku的所有兄弟产品的销售名和值组合关系
@@ -161,7 +172,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
          */
         //传入spu_id
         Long spuId = skuInfo.getSpuId();
-        String valueJson =spuSaleAttrService.getAllSkuSaleValueJson(spuId);
+        String valueJson = spuSaleAttrService.getAllSkuSaleValueJson(spuId);
         detailTo.setValuesSkuJson(valueJson);
 
 
@@ -172,12 +183,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Override
     public BigDecimal getSku101Price(Long skuId) {
-        BigDecimal price=skuInfoMapper.get101Price(skuId);
+        BigDecimal price = skuInfoMapper.get101Price(skuId);
         return price;
     }
 
     /**
      * //1.查询skuinfo
+     *
      * @param skuId
      * @return
      */
@@ -189,12 +201,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     /**
      * 2.查询sku商品图片集合
+     *
      * @param skuId
      * @return
      */
     @Override
     public List<SkuImage> getDetailSkuImages(Long skuId) {
-        List<SkuImage> imageList= skuImageService.getSkuImage(skuId);
+        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
         return imageList;
     }
 
@@ -203,17 +216,58 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
         //查询出所有id
         List<Long> ids = skuInfoMapper.getAllSkuId();
-        return ids ;
+        return ids;
     }
 
 
     @Autowired
     CacheOpsService cacheOpsService;
+
     @GmallCache
     @Override
     public void updateSkuInfo(SkuInfo skuInfo) {
         skuInfoMapper.update(skuInfo, null);
         cacheOpsService.delay2Delete(skuInfo.getId().toString());
+    }
+
+    @Autowired
+    BaseTrademarkService baseTrademarkService;
+
+    @Override
+    public Goods getGoodsBySkuId(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        Goods goods = new Goods();
+
+        goods.setId(skuId);
+
+        goods.setDefaultImg(skuInfo.getSkuDefaultImg());
+        goods.setTitle(skuInfo.getSkuName());
+        goods.setPrice(skuInfo.getPrice().doubleValue());
+        goods.setCreateTime(new Date());
+        goods.setTmId(skuInfo.getTmId());
+
+        BaseTrademark trademark = baseTrademarkService.getById(skuInfo.getTmId());
+        goods.setTmName(trademark.getTmName());
+        goods.setTmLogoUrl(trademark.getLogoUrl());
+
+        //根据skuId查询分类详情
+        Long category3Id = skuInfo.getCategory3Id();
+        CategoryViewTo categoryView = baseCategory3Mapper.getCategoryView(category3Id);
+        goods.setCategory1Id(categoryView.getCategory1Id());
+        goods.setCategory1Name(categoryView.getCategory1Name());
+        goods.setCategory2Id(categoryView.getCategory2Id());
+        goods.setCategory2Name(categoryView.getCategory2Name());
+        goods.setCategory3Id(categoryView.getCategory3Id());
+        goods.setCategory3Name(categoryView.getCategory3Name());
+
+        // TODO 热度分更新
+        goods.setHotScore(0L);
+        //查询当前sku所有平台属性和值
+        List<SearchAttr> attrs = skuAttrValueService.getAttrNameAndVal(skuId);
+        goods.setAttrs(attrs);
+
+
+        return goods;
     }
 }
 

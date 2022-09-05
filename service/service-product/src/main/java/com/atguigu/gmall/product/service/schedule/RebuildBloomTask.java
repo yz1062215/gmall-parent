@@ -1,4 +1,4 @@
-package com.atguigu.gmall.product.schedule;
+package com.atguigu.gmall.product.service.schedule;
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.product.bloom.BloomDataQueryService;

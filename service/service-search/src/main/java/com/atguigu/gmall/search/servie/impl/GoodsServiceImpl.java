@@ -1,4 +1,7 @@
 package com.atguigu.gmall.search.servie.impl;
+import com.atguigu.gmall.model.list.SearchAttr;
+import com.google.common.collect.Lists;
+import com.atguigu.gmall.model.vo.search.OrderMapVo;
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.model.list.Goods;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
@@ -22,6 +26,9 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class GoodsServiceImpl implements GoodsService {
@@ -50,14 +57,135 @@ public class GoodsServiceImpl implements GoodsService {
         Query query = buildQueryDsl(paramVo);
 
         //2.搜索业务
-        IndexCoordinates goods = IndexCoordinates.of("goods");
-        SearchHits<Goods> searchHits = esRestTemplate.search(query,
+        SearchHits<Goods> goods = esRestTemplate.search(query,
                 Goods.class,
-                goods);
+                IndexCoordinates.of("goods"));
 
         //3.搜索结果转换
 
-        return null;
+        SearchResponseVo searchResponseVo=buildSearchResponseResult(goods,paramVo);
+
+        return searchResponseVo;
+    }
+
+    /**
+     * 构建es查询的响应结果
+     * @param goods
+     * @return
+     */
+    private SearchResponseVo buildSearchResponseResult(SearchHits<Goods> goods,SearchParamVo paramVo) {
+        SearchResponseVo vo = new SearchResponseVo();
+
+        //检索时前端响应检索条件
+        vo.setSearchParam(paramVo);
+        //构建品牌面包屑   1:小米
+        if (!StringUtils.isEmpty(paramVo.getTrademark())){
+            vo.setTrademarkParam("品牌"+paramVo.getTrademark().split(":")[1]); //品牌：小米
+        }
+        //构建平台属性面包屑
+        if (paramVo.getProps()!=null&&paramVo.getProps().length > 0){
+            List<SearchAttr> propsParams=new ArrayList<>();
+            //24:8G：运行内存
+            for (String prop : paramVo.getProps()) {
+                String[] split = prop.split(":");
+
+                SearchAttr searchAttr = new SearchAttr();
+                searchAttr.setAttrId(Long.valueOf(split[0]));
+                searchAttr.setAttrValue(split[1]);
+                searchAttr.setAttrName(split[2]);
+
+                propsParams.add(searchAttr);
+
+            }
+            vo.setPropsParamList(propsParams);
+        }
+
+        //品牌列表  聚合分析 TODO
+        vo.setTrademarkList(Lists.newArrayList());
+        //属性列表 聚合分析 TODO
+        vo.setAttrsList(Lists.newArrayList());
+
+        //排序信息   回显  1:desc
+        if (!StringUtils.isEmpty(paramVo.getOrder())){
+            String order = paramVo.getOrder();
+            OrderMapVo mapVo = new OrderMapVo();
+            mapVo.setType(order.split(":")[0]);
+            mapVo.setSort(order.split(":")[1]);
+            vo.setOrderMap(mapVo);
+        }
+
+        //所有搜索到的商品列表
+        List<Goods> goodsList = new ArrayList<>();
+        List<SearchHit<Goods>> hits = goods.getSearchHits();//获取搜索到的商品
+        for (SearchHit<Goods> hit : hits) {
+            Goods content = hit.getContent();//命中记录的商品
+            //如果模糊检索了  处理高亮
+            if (!StringUtils.isEmpty(paramVo.getKeyword())){
+                String title = hit.getHighlightField("title").get(0);//拿到第一个高亮关键字
+                //设置高亮
+                content.setTitle(title);
+            }
+            goodsList.add(content);
+        }
+        vo.setGoodsList(goodsList);
+        //页码
+        vo.setPageNo(paramVo.getPageNo());
+
+        //总页码
+        long totalHits = goods.getTotalHits();
+        //获取命中的页数 对命中条数数据取余，余数为0返回整数除结果，余数不为,页码+1
+        long pageSize = totalHits % SysRedisConst.SEARCH_PAGESIZE == 0 ?
+                totalHits / SysRedisConst.SEARCH_PAGESIZE
+                : (totalHits / SysRedisConst.SEARCH_PAGESIZE + 1);
+        vo.setTotalPages(new Integer(pageSize+""));
+
+        //旧链接地址
+        String url=makeUrlParam(paramVo);
+        vo.setUrlParam(url);
+        return vo;
+    }
+
+    /**
+     * 获取旧链接
+     * @param paramVo
+     * @return
+     */
+    private String makeUrlParam(SearchParamVo paramVo) {
+        //构建String
+        StringBuilder builder = new StringBuilder("list.html?");
+        //1.分类参数
+        if (paramVo.getCategory1Id()!=null){
+            builder.append("&category1Id="+paramVo.getCategory1Id());
+        }
+        if (paramVo.getCategory2Id()!=null){
+            builder.append("&category2Id="+paramVo.getCategory2Id());
+        }
+        if (paramVo.getCategory3Id()!=null){
+            builder.append("&category3Id="+paramVo.getCategory3Id());
+
+        }
+        //2.关键字
+        if (!StringUtils.isEmpty(paramVo.getKeyword())) {
+            builder.append("&keyword=" + paramVo.getKeyword());
+        }
+        //3.品牌
+        if (!StringUtils.isEmpty(paramVo.getTrademark())){
+            builder.append("&trademark="+paramVo.getTrademark());
+        }
+        //4.属性
+        if (paramVo.getProps() != null && paramVo.getProps().length > 0) {
+            String[] props = paramVo.getProps();
+            for (String prop : props) {
+                builder.append("&props=" + prop);
+            }
+        }
+        ////5.排序
+        //builder.append("&order=" + paramVo.getOrder());
+        ////6.页码
+        //builder.append("&pageNo"+paramVo.getPageNo());
+
+        return builder.toString();
+
     }
 
     /**
@@ -136,21 +264,15 @@ public class GoodsServiceImpl implements GoodsService {
             //String prop = split[0].equals("1") ? "hotScore" : "price";
 
             //判断排序使用的字段为什么
-            String orderFiled="hotScore";
+            String orderField="hotScore";
             switch (split[0]) {
-                case "1":
-                    orderFiled = "hotScore";
-                    break;
-                case "2":
-                    orderFiled = "price";
-                    break;
-                case "3":
-                    orderFiled = "createTime";
-                default:
-                    orderFiled = "hotScore";
+                case "1": orderField = "hotScore";break;
+                case "2": orderField = "price";break;
+                case "3": orderField = "createTime";break;
+                default: orderField = "hotScore";
 
             }
-            Sort sort = Sort.by(orderFiled);
+            Sort sort = Sort.by(orderField);
             if (split[1].equals("asc")) {
                 sort = sort.ascending();//会返回sort
             } else {
@@ -178,6 +300,9 @@ public class GoodsServiceImpl implements GoodsService {
             query.setHighlightQuery(highlightQuery);
         }
         //模糊查询高亮结束..............
+
+
+        //TODO  聚合分析...
 
 
 

@@ -35,11 +35,24 @@ public class SearcherApiController {
         goodsService.del(skuId);
         return Result.ok();
     }
+
     @PostMapping("/goods/search")
     Result<SearchResponseVo> search(@RequestBody SearchParamVo paramVo){
         //TODO 检索功能
         SearchResponseVo searchResponseVo=goodsService.search(paramVo);
         return Result.ok(searchResponseVo);
+    }
+
+    /**
+     * 增加热度分
+     * @param skuId
+     * @return
+     */
+    @GetMapping("/goods/hotscore/{skuId}")
+    public Result updateHotScore(@PathVariable("skuId") Long skuId,
+                                 @RequestParam("score") Long score) {
+        goodsService.updateScore(skuId,score);
+        return Result.ok();
     }
 
 }

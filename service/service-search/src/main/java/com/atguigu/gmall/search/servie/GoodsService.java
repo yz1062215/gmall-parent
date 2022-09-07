@@ -15,4 +15,6 @@ public interface GoodsService {
      * @return
      */
     SearchResponseVo search(SearchParamVo paramVo);
+
+    void updateScore(Long skuId, Long score);
 }

@@ -6,7 +6,10 @@ import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringCloudApplication
-@EnableFeignClients(basePackages = {"com.atguigu.gmall.feign.product"})
+@EnableFeignClients(basePackages = {
+        "com.atguigu.gmall.feign.product",
+        "com.atguigu.gmall.feign.search"}
+)
 //@Import(AppThreadPoolAutoConfig.class)
 @EnableThreadPool
 //@EnableRedisson

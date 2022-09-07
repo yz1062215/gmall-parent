@@ -25,6 +25,9 @@ public class SkuDetailApiController {
     @GetMapping("/sukdetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         SkuDetailTo skuDetailTo = skuDetailService.getSkuDetail(skuId);
+
+        //更新热度分  批量更新
+        skuDetailService.updateHotscore(skuId);
         return Result.ok(skuDetailTo);
     }
 }

@@ -27,8 +27,7 @@ public enum ResultCodeEnum {
     SECKILL_ILLEGAL(217, "请求不合法"),
     SECKILL_ORDER_SUCCESS(218, "下单成功"),
     COUPON_GET(220, "优惠券已经领取"),
-    COUPON_LIMIT_GET(221, "优惠券已发放完毕"),
-    ;
+    COUPON_LIMIT_GET(221, "优惠券已发放完毕"), LOGIN_ERROR(2081,"登录失败，用户名或密码错误" );
 
     private Integer code;
 

@@ -13,4 +13,5 @@ public class SysRedisConst {
     public static final int SEARCH_PAGESIZE = 10;
     public static final String SKU_HOTSCORE_PREFIX = "sku:hotscore:";
     public static final String LOGIN_USER = "user:login:";
+    public static final String USERID_HEADER = "userid" ;
 }

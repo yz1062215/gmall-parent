@@ -13,13 +13,13 @@ spring:
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
 
-feign:
-  client:
-    config:
-      default:
-        connect-timeout: 500  #连接超时时间
-        read-timeout: 5000 #读超时时间
-        retryer: com.atguigu.gmall.product.retry.MyRetry
+#feign:
+#  client:
+#    config:
+#      default:
+#        connect-timeout: 500  #连接超时时间
+#        read-timeout: 5000 #读超时时间
+#        retryer: com.atguigu.gmall.product.retry.MyRetry
 #  redis:
 #    host: 192.168.6.152
 #    password: yz123456..

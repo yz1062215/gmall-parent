@@ -17,7 +17,7 @@ public class AuthContextHolder {
      * @param request
      * @return
      */
-    public static String getUserId(HttpServletRequest request) {
+    public  String getUserId(HttpServletRequest request) {
         String userId = request.getHeader("userId");
         return StringUtils.isEmpty(userId) ? "" : userId;
     }
@@ -27,7 +27,7 @@ public class AuthContextHolder {
      * @param request
      * @return
      */
-    public static String getUserTempId(HttpServletRequest request) {
+    public  String getUserTempId(HttpServletRequest request) {
         String userTempId = request.getHeader("userTempId");
         return StringUtils.isEmpty(userTempId) ? "" : userTempId;
     }

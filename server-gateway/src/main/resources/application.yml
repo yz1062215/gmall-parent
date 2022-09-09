@@ -39,6 +39,10 @@ spring:
           uri: lb://service-user
           predicates:  #断言
             - Path=/api/user/**
+        - id: cart_router
+          uri: lb://service-cart
+          predicates:
+            - Path=/api/cart/**
 
         - id: web_all_route
           uri: lb://web-all
@@ -52,7 +56,7 @@ app:
       - /img/**
       - /login.html
       - /api/user/passport/login
-      - /list.html?*
+      - /list.html
 
     login-auth-url: #登录以后才能访问的资源
       - /order/**

@@ -10,6 +10,7 @@ var auth = {
 
     removeToken() {
         return $.cookie('token', '', {domain: 'gmall.com', expires: 7, path: '/'})
+        // return $.cookie('userInfo', '', {domain: 'gmall.com', expires: 7, path: '/'})
     },
 
     isTokenExist() {

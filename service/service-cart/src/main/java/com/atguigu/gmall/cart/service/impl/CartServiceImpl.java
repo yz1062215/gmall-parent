@@ -16,10 +16,13 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,8 @@ public class CartServiceImpl implements CartService {
     StringRedisTemplate redisTemplate;
     @Autowired
     SkuProductFeignClient skuFeignClient;
+    @Autowired
+    ThreadPoolExecutor executor;
     @Override
     public SkuInfo addToCart(Long skuId, Integer num) {
         //1.决定购物车使用那个key
@@ -228,8 +233,34 @@ public class CartServiceImpl implements CartService {
                 .sorted((o1, o2) -> o2.getCreateTime().compareTo(o1.getCreateTime()))
                 .collect(Collectors.toList());
 
+        //用户查询购物车列表时更新查询购物车最新价格   异步
+
+        //1.获取老请求
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+
+        executor.submit(() -> {
+            //2.绑定老请求到此线程中
+            RequestContextHolder.setRequestAttributes(attributes);
+            updateAllItemsPrice(cartKey, infos);
+            //3.移除数据
+            RequestContextHolder.resetRequestAttributes();
+        });
+
+
         return infos;
     }
+
+    //public static void main(String[] args) throws InterruptedException {
+    //    List<Integer> list= Arrays.asList(1,2,3,5,9,7,4,11,15,20);
+    //    System.out.println("main线程："+Thread.currentThread());
+    //    list.stream().parallel().map(integer->{
+    //        System.out.println("流线程："+Thread.currentThread());
+    //        return integer+1;
+    //    }).collect(Collectors.toList());
+    //
+    //    Thread.sleep(10000000);
+    //
+    //}
 
     /**
      * 合并临时购物车和登录用户购物车
@@ -309,6 +340,28 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, String, String> cart = redisTemplate.boundHashOps(cartKey);
 
         cart.delete(skuId.toString());
+    }
+
+    @Override
+    public void updateAllItemsPrice(String cartKey,List<CartInfo>  cartInfos) {
+        BoundHashOperations<String, String, String> cartsOps = redisTemplate.boundHashOps(cartKey);
+        System.out.println("更新价格启动"+Thread.currentThread());
+        //更新所有价格
+        cartInfos.stream().forEach(cartInfo -> {
+            //1.查出最新价格
+            Result<BigDecimal> price = skuFeignClient.getSku101Price(cartInfo.getSkuId());
+
+            //2.设置新价格
+            cartInfo.setSkuPrice(price.getData());
+            cartInfo.setUpdateTime(new Date());
+            //3.更新购物车价格
+            cartsOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+
+        });
+        System.out.println("更新价格结束"+Thread.currentThread());
+
+
+
     }
 
 

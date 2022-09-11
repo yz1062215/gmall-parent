@@ -92,4 +92,9 @@ public interface CartService {
      * @param cartKey
      */
     void deleteCartItem(Long skuId, String cartKey);
+
+    /**
+     * 更新当前购物车中商品价格
+     */
+    void updateAllItemsPrice(String cartKey,List<CartInfo> cartInfos);
 }

@@ -29,7 +29,12 @@ public enum ResultCodeEnum {
     COUPON_GET(220, "优惠券已经领取"),
     COUPON_LIMIT_GET(221, "优惠券已发放完毕"),
     CART_OVERFLOW(3001,"购物车品类超出限制  请移除多余商品"),
-    LOGIN_ERROR(2081,"登录失败，用户名或密码错误" ), CART_ITEM_SKUNUM_OVERFLOW(3002, "商品数量超出单次购买限制........");
+    LOGIN_ERROR(2081,"登录失败，用户名或密码错误" ),
+    TOKEN_INVALID(4000,"页面已经过期，请重新刷新" ),
+    ORDER_NO_STOCK(4001,"订单商品库存不足：" ),
+    ORDER_PRICE_CHANGE(4002,"订单中以下商品存在价格波动，请刷新后重试：" ),
+    //TOKEN_INVALID
+    CART_ITEM_SKUNUM_OVERFLOW(3002, "商品数量超出单次购买限制........");
 
     private Integer code;
 

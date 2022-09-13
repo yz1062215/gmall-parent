@@ -2,7 +2,6 @@ package com.atguigu.gmall.common.handler;
 
 import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
-import com.atguigu.gmall.common.result.ResultCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,20 +19,22 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result error(Exception e){
         e.printStackTrace();
-        return Result.fail();
+        Result<Object> result = Result.fail();
+
+        return result.message(e.getMessage());
     }
 
     /**
      * 自定义异常处理方法
-     * @param exception
+     * @param e
      * @return
      */
     @ExceptionHandler(GmallException.class)
     @ResponseBody
-    public Result error(GmallException exception){
-        //业务状态的枚举类
-        ResultCodeEnum codeEnum = exception.getCodeEnum();
-        Result<String> result = Result.build("", codeEnum);
-        return result;  //给前端的返回
+    public Result error(GmallException e){
+        Result<Object> fail = Result.fail();
+        fail.setCode(e.getCode());
+        fail.setMessage(e.getMessage());
+        return fail;
     }
 }

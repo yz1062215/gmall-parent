@@ -64,7 +64,8 @@ app:
       - /list.html
 
     login-auth-url: #登录以后才能访问的资源
-      - /order/**
+      - /trade.html
+      - /api/**/auth/**
     deny-url:
       - /api/inner/**
 

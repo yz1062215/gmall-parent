@@ -3,6 +3,8 @@ server:
 
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   profiles:
     include: sharding
   datasource:
@@ -11,3 +13,6 @@ spring:
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.6.152:3306/gmall_order?useSSL=false
+
+app:
+  ware-url: http://localhost:10001/

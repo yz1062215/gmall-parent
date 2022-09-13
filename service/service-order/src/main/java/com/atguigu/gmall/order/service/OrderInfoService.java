@@ -2,6 +2,7 @@ package com.atguigu.gmall.order.service;
 
 
 import com.atguigu.gmall.model.order.OrderInfo;
+import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,5 +11,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2022-09-12 12:58:36
 */
 public interface OrderInfoService extends IService<OrderInfo> {
-
+    /**
+     * 保存订单信息到数据库
+     * @param submitVo
+     * @return
+     */
+    Long saveOrder(OrderSubmitVo submitVo,String tradeNo);
 }

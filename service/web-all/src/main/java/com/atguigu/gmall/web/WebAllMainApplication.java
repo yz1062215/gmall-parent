@@ -23,7 +23,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         "com.atguigu.gmall.feign.product",
         "com.atguigu.gmall.feign.search",
         "com.atguigu.gmall.feign.user",
-        "com.atguigu.gmall.feign.cart"
+        "com.atguigu.gmall.feign.cart",
+        "com.atguigu.gmall.feign.order"
 }) //只会扫描主程序所在的子包
 @EnableAutoFeignInterceptor
 @SpringCloudApplication

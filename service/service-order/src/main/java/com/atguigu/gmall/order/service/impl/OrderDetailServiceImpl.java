@@ -7,6 +7,8 @@ import com.atguigu.gmall.order.service.OrderDetailService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
 * @author yzz
 * @description 针对表【order_detail(订单明细表)】的数据库操作Service实现
@@ -16,6 +18,10 @@ import org.springframework.stereotype.Service;
 public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailMapper, OrderDetail>
     implements OrderDetailService {
 
+    @Override
+    public List<OrderDetail> submitOrder(Long tradeNo) {
+        return null;
+    }
 }
 
 

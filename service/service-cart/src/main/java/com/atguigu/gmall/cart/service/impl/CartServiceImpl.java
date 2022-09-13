@@ -346,18 +346,39 @@ public class CartServiceImpl implements CartService {
     public void updateAllItemsPrice(String cartKey,List<CartInfo>  cartInfos) {
         BoundHashOperations<String, String, String> cartsOps = redisTemplate.boundHashOps(cartKey);
         System.out.println("更新价格启动"+Thread.currentThread());
-        //更新所有价格
-        cartInfos.stream().forEach(cartInfo -> {
-            //1.查出最新价格
-            Result<BigDecimal> price = skuFeignClient.getSku101Price(cartInfo.getSkuId());
+        //TODO 更新价格不能使用传过来的cartInfos   应该去redis重新查询
+        cartsOps.values().stream()
+                .map(cartInfoStr -> Jsons.toObj(cartInfoStr, CartInfo.class))
+                .forEach(cartInfo -> {
+                    //1.查询最新价格
+                    Result<BigDecimal> priceData = skuFeignClient.getSku101Price(cartInfo.getSkuId());
+                    //2.设置新价格
+                    cartInfo.setSkuPrice(priceData.getData());
+                    cartInfo.setUpdateTime(new Date());
 
-            //2.设置新价格
-            cartInfo.setSkuPrice(price.getData());
-            cartInfo.setUpdateTime(new Date());
-            //3.更新购物车价格
-            cartsOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+                    //3.更新购物车价格
+                    //重复校验解决.....  异步
+                    if (cartsOps.hasKey(cartInfo.getSkuId().toString())){  //加入主键存在判断
+                        cartsOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+                    }
 
-        });
+                }
+
+
+        );
+
+        ////更新所有价格
+        //cartInfos.stream().forEach(cartInfo -> {
+        //    //1.查出最新价格
+        //    Result<BigDecimal> price = skuFeignClient.getSku101Price(cartInfo.getSkuId());
+        //
+        //    //2.设置新价格
+        //    cartInfo.setSkuPrice(price.getData());
+        //    cartInfo.setUpdateTime(new Date());
+        //    //3.更新购物车价格
+        //    cartsOps.put(cartInfo.getSkuId().toString(), Jsons.toStr(cartInfo));
+        //
+        //});
         System.out.println("更新价格结束"+Thread.currentThread());
 
 

@@ -2,15 +2,19 @@ package com.atguigu.gmall.order.service.impl;
 
 import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.gmall.constant.MqConst;
 import com.atguigu.gmall.model.enums.OrderStatus;
 import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.order.OrderDetail;
 import com.atguigu.gmall.model.order.OrderInfo;
+import com.atguigu.gmall.model.to.mq.OrderMsg;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.order.service.OrderDetailService;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,9 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     OrderInfoMapper orderInfoMapper;
     @Autowired
     OrderDetailService orderDetailService;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
     @Transactional  //开启事务
     @Override
     public Long saveOrder(OrderSubmitVo submitVo, String tradeNo) {
@@ -46,8 +53,27 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         //批量保存到订单详情库
         orderDetailService.saveBatch(details);
+
+        //创建订单完成发送消息
+        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(),orderInfo.getUserId());
+        rabbitTemplate.convertAndSend(MqConst.EXCHANGE_ORDER_EVNT,MqConst.RK_ORDER_CREATED, Jsons.toStr(orderMsg));
         //4.返回订单id
         return orderInfo.getId();//雪花算法生成的id
+    }
+
+    /**
+     * 改变订单状态
+     * @param orderId
+     * @param userId
+     * @param closed
+     * @param expecteds
+     */
+    @Override
+    public void changeOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expecteds) {
+        String processStatus = closed.name();
+        String orderStatus = closed.getOrderStatus().name();
+
+        orderInfoMapper.changeOrderStatus(orderId,userId,processStatus,orderStatus,expecteds);
     }
 
     /**

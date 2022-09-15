@@ -10,11 +10,13 @@ import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.feign.user.UserFeiClient;
 import com.atguigu.gmall.feign.ware.WareFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.vo.order.CartInfoVoNew;
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.order.biz.OrderBizService;
 import com.atguigu.gmall.order.service.OrderInfoService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -41,6 +43,8 @@ public class OrderBizServiceImpl implements OrderBizService {
     StringRedisTemplate redisTemplate;
     @Autowired
     OrderInfoService orderInfoService;
+    @Autowired
+    RabbitTemplate rabbitTemplate;
     /**
      * 获取订单确认信息
      * @return
@@ -188,9 +192,19 @@ public class OrderBizServiceImpl implements OrderBizService {
         //4.保存订单信息到数据库
         Long orderId=orderInfoService.saveOrder(submitVo,tradeNo);
 
+        //TODO 保存订单时
+
         //5、清除购物车中选中的商品
         cartFeignClient.deleteChecked();
         return orderId;
+    }
+
+    @Override
+    public void closeOrder(Long orderId, Long userId) {
+        ProcessStatus closed = ProcessStatus.CLOSED;
+        List<ProcessStatus> expecteds=Arrays.asList(ProcessStatus.UNPAID,ProcessStatus.FINISHED);//期望范围
+        //如果订单未支付 或者已经完成 关闭订单
+        orderInfoService.changeOrderStatus(orderId,userId,closed,expecteds);
     }
 
 

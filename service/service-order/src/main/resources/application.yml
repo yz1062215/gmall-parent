@@ -6,13 +6,27 @@ spring:
   main:
     allow-bean-definition-overriding: true
   profiles:
-    include: sharding
+    include: sharding1
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.6.152:3306/gmall_order?useSSL=false
+
+#  rabbitmq:
+#    username: admin
+#    password: admin
+#    host: 192.168.6.152
+#    port: 5672
+#    virtual-host: /
+#    publisher-returns: true
+#    publisher-confirm-type: simple
+#    listener: #监听器帮我们拿到消息。默认自动ack
+#      type: simple
+#      simple:
+#        acknowledge-mode: manual
+#        batch-size: 12
 
 app:
   ware-url: http://localhost:10001/

@@ -28,7 +28,7 @@ public class PayController {
         Result<OrderInfo> orderInfo = orderFeignClient.getOrderInfo(orderId);
         Date ttl = orderInfo.getData().getExpireTime();
         Date cur = new Date();
-        if(cur.before(ttl)){
+        if(cur.before(ttl)){//当前时间小于过期时间
             //订单未过期，可以展示支付页
             model.addAttribute("orderInfo",orderInfo.getData());
             return "payment/pay";

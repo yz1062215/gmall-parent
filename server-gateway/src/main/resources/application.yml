@@ -44,7 +44,7 @@ spring:
           predicates:
             - Path=/api/cart/**
 
-        - id: cart_order
+        - id: order_router
           uri: lb://service-order
           predicates:
             - Path=/api/order/**

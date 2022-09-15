@@ -26,6 +26,7 @@ public class SysRedisConst {
     public static final String ORDER_TEMP_TOKEN = "order:temptoken:"; //order:temptoken:交易号
 
     //订单超时关闭时间
-    public static final Integer ORDER_CLOSE_TTL = 60*45; //秒为单位
+    public static final Integer ORDER_CLOSE_TTL = 10; //秒为单位  60*45
     public static final Integer ORDER_REFUND_TTL = 60*60*24*30;
+    public static final String MQ_RETRY = "mq:message:";
 }

@@ -33,6 +33,7 @@ public enum ResultCodeEnum {
     TOKEN_INVALID(4000,"页面已经过期，请重新刷新" ),
     ORDER_NO_STOCK(4001,"订单商品库存不足：" ),
     ORDER_PRICE_CHANGE(4002,"订单中以下商品存在价格波动，请刷新后重试：" ),
+    ORDER_EXPIRE(4003,"支付超时，请稍后重试........"),
     //TOKEN_INVALID
     CART_ITEM_SKUNUM_OVERFLOW(3002, "商品数量超出单次购买限制........");
 

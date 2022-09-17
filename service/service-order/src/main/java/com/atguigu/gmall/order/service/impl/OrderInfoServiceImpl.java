@@ -130,7 +130,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         orderInfo.setDeliveryAddress(submitVo.getDeliveryAddress());
         orderInfo.setOrderComment(submitVo.getOrderComment());
         //5.对外交易号
-        orderInfo.setTrackingNo(tradeNo);
+        orderInfo.setOutTradeNo(tradeNo);
         //6.交易体
         orderInfo.setTradeBody(submitVo.getOrderDetailList().get(0).getSkuName());
 
@@ -143,7 +143,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         orderInfo.setOrderStatus(OrderStatus.UNPAID.name());
 
         //10.物流编号  发货后才有
-        orderInfo.setOutTradeNo("");
+        //orderInfo.setOutTradeNo("");
         //11.父订单id  TODO拆单................
         orderInfo.setParentOrderId(0L);
         //12.订单图片 默认取第一件商品的图片

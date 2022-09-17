@@ -48,7 +48,10 @@ spring:
           uri: lb://service-order
           predicates:
             - Path=/api/order/**
-
+        - id: payment_router
+          uri: lb://service-payment
+          predicates:
+            - Path=/api/payment/**
         - id: web_all_route
           uri: lb://web-all
           predicates:  #断言

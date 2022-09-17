@@ -38,4 +38,10 @@ public class PayController {
 
     }
 
+    @GetMapping("/pay/success.html")
+    public String paySuccessPage(){
+
+        return "payment/success";
+    }
+
 }

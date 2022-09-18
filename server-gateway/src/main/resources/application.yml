@@ -64,11 +64,12 @@ app:
       - /img/**
       - /login.html
       - /api/user/passport/login
-      - /list.html
+#      - /api/order/orderSplit
 
     login-auth-url: #登录以后才能访问的资源
       - /trade.html
       - /api/**/auth/**
+#      - /api/order/**
     deny-url:
       - /api/inner/**
 

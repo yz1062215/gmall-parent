@@ -27,6 +27,16 @@ public class OrderController {
         }
         return "order/trade";
     }
+    //订单列表页
+    /**
+     * 订单列表页
+     * @return
+     */
+    @GetMapping("/myOrder.html")
+    public String myOrderPage(){
+
+        return "order/myOrder";
+    }
 }
 
 

@@ -18,4 +18,6 @@ public interface OrderDetailService extends IService<OrderDetail> {
      * @return
      */
     List<OrderDetail> submitOrder(Long tradeNo);
+
+    List<OrderDetail> getOrderDetails(Long orderId, Long userId);
 }

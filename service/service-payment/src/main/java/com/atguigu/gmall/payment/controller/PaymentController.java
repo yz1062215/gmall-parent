@@ -62,6 +62,7 @@ public class PaymentController {
         if (b) {
             //验签通过 异步打印日志
             log.info("异步通知抵达。支付成功，验签通过。数据：{}", Jsons.toStr(paramMaps));
+            alipayService.sendPayedMsg(paramMaps);
         }else {
             return "error";
         }

@@ -8,10 +8,12 @@ import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.common.util.DateUtil;
 import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.gmall.constant.MqConst;
 import com.atguigu.gmall.feign.order.OrderFeignClient;
 import com.atguigu.gmall.model.order.OrderInfo;
 import com.atguigu.gmall.payment.config.AlipayProperties;
 import com.atguigu.gmall.payment.service.AlipayService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,9 @@ public class AlipayServiceImpl implements AlipayService {
     AlipayClient alipayClient;
     @Autowired
     AlipayProperties properties;
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
     /**
      * 获取支付宝支付页面
      * @param orderId
@@ -92,5 +97,12 @@ public class AlipayServiceImpl implements AlipayService {
                 properties.getCharset(),//字符编码
                 properties.getSignType());//签名类型
         return b;
+    }
+
+    @Override
+    public void sendPayedMsg(Map<String, String> paramMaps) {
+        rabbitTemplate.convertAndSend(MqConst.EXCHANGE_ORDER_EVNT,
+                MqConst.RK_ORDER_PAYED,
+                Jsons.toStr(paramMaps));
     }
 }

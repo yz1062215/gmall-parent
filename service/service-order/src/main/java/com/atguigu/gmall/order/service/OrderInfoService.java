@@ -22,5 +22,16 @@ public interface OrderInfoService extends IService<OrderInfo> {
     Long saveOrder(OrderSubmitVo submitVo,String tradeNo);
 
 
-    void changeOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expecteds);
+    void changeOrderStatus(Long orderId, Long userId, ProcessStatus whileChange, List<ProcessStatus> expecteds);
+
+    OrderInfo getOrderInfoByOutTradeNoAndUserId(String outTradeNo, Long userId);
+
+    /**
+     * 根据订单id和用户id查询订单信息
+     * @param orderId
+     * @param userId
+     * @return
+     */
+    OrderInfo getOrderInfoByOrderIdAndUserId(Long orderId, Long userId);
+
 }

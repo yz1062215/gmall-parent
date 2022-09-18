@@ -1,12 +1,15 @@
 package com.atguigu.gmall.rabbit;
 
+import com.atguigu.gmall.service.RabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.amqp.RabbitTemplateConfigurer;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.support.RetryTemplate;
@@ -14,6 +17,7 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 @EnableRabbit //开启rabbitmq注解支持
 @Slf4j
+@AutoConfigureAfter(RedisAutoConfiguration.class)
 public class AppRabbitConfiguration {
 
 
@@ -48,5 +52,10 @@ public class AppRabbitConfiguration {
 
         return rabbitTemplate;
 
+    }
+
+    @Bean
+    RabbitService rabbitService(){
+        return new RabbitService();
     }
 }

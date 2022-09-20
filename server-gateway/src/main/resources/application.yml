@@ -7,10 +7,10 @@ server:
 
 #配置链路追踪地址
 spring:
-#  zipkin:
-#    base-url: http://192.168.6.152:9411/
-#    sender:
-#      type: web
+  #  zipkin:
+  #    base-url: http://192.168.6.152:9411/
+  #    sender:
+  #      type: web
   cloud:
     gateway:
       globalcors:
@@ -24,20 +24,21 @@ spring:
       routes:
         - id: product_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
           uri: lb://service-product
-          predicates:  #断言
+          predicates: #断言
             - Path=/admin/product/**
         - id: activity_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
           uri: lb://service-activity
-          predicates:  #断言
-            - Path=/admin/activity/**
+          predicates: #断言
+            #            - Path=/admin/activity/**
+            - Path=/api/activity/**
 
         - id: incr_route
           uri: lb://service-item
-          predicates:  #断言
+          predicates: #断言
             - Path=/lock/incr
         - id: user_route
           uri: lb://service-user
-          predicates:  #断言
+          predicates: #断言
             - Path=/api/user/**
         - id: cart_router
           uri: lb://service-cart
@@ -54,22 +55,22 @@ spring:
             - Path=/api/payment/**
         - id: web_all_route
           uri: lb://web-all
-          predicates:  #断言
+          predicates: #断言
             - Host=**.gmall.com
 app:
   auth:
-    no-auth-url:  #任意人无需登录都能访问的路径
+    no-auth-url: #任意人无需登录都能访问的路径
       - /css/**
       - /js/**
       - /img/**
       - /login.html
       - /api/user/passport/login
-#      - /api/order/orderSplit
+    #      - /api/order/orderSplit
 
     login-auth-url: #登录以后才能访问的资源
       - /trade.html
       - /api/**/auth/**
-#      - /api/order/**
+    #      - /api/order/**
     deny-url:
       - /api/inner/**
 

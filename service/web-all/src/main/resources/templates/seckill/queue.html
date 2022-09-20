@@ -2,15 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
-    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
     <title>尚品汇 我的购物车</title>
     <link rel="icon" href="/img/favicon.ico">
 
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <link rel="stylesheet" type="text/css" href="/css/all.css" />
-    <link rel="stylesheet" type="text/css" href="/css/pages-cart.css" />
+    <link rel="stylesheet" type="text/css" href="/css/all.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/pages-cart.css"/>
     <div th:include="common/head :: head"></div>
 </head>
 
@@ -30,7 +30,7 @@
     <div class="seckill_dev" v-if="show == 3">
         抢购成功&nbsp;&nbsp;
 
-        <a href="/seckill/trade.html" target="_blank">去下单</a>
+        <a th:href="@{/seckill/trade.html(skuId=${skuId})}" target="_blank">去下单</a>
     </div>
     <div class="seckill_dev" v-if="show == 4">
         抢购成功&nbsp;&nbsp;
@@ -139,7 +139,7 @@
         // html加载完成后执行
         mounted() {
             const timer = setInterval(() => {
-                if(this.code != 211) {
+                if (this.code != 211) {
                     clearInterval(timer);
                 }
                 this.checkOrder()
@@ -160,7 +160,7 @@
                     //debugger
                     console.log(JSON.stringify(response))
                     //  下单成功
-                    if(response.data.code == 200) {
+                    if (response.data.code == 200) {
                         this.isCheckOrder = true
                     } else {
                         this.show = 2
@@ -172,7 +172,7 @@
 
             checkOrder() {
                 //  isCheckOrder 默认是 fasle!
-                if(!this.isCheckOrder) return
+                if (!this.isCheckOrder) return
 
                 seckill.checkOrder(this.skuId).then(response => {
 
@@ -180,15 +180,15 @@
                     this.code = response.data.code
                     console.log(JSON.stringify(this.data))
                     //排队中
-                    if(response.data.code == 211) {
+                    if (response.data.code == 211) {
                         this.show = 1
                     } else {
                         //秒杀成功
-                        if(response.data.code == 215) {
+                        if (response.data.code == 215) {
                             this.show = 3
                             this.message = response.data.message
                         } else {
-                            if(response.data.code == 218) {
+                            if (response.data.code == 218) {
                                 this.show = 4
                                 this.message = response.data.message
                             } else {
@@ -209,7 +209,7 @@
         background-color: #fff;
         padding: 44px 30px;
         box-shadow: 0 6px 32px rgba(0, 0, 0, .13);
-        margin: 50px auto ;
+        margin: 50px auto;
         font-size: 18px;
         text-align: center;
     }

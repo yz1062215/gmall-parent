@@ -3,6 +3,7 @@ package com.atguigu.gmall.activity.controller;
 import com.atguigu.gmall.activity.biz.SeckillBizService;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
+import com.atguigu.gmall.model.order.OrderInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/activity/seckill/auth")
-public class SeckillCOntroller {
+public class SeckillController {
     @Autowired
     SeckillBizService bizService;
 
@@ -55,6 +56,20 @@ public class SeckillCOntroller {
     public Result checkOrder(@PathVariable("skuId") Long skuId) {
         ResultCodeEnum codeEnum = bizService.checkSeckillOrderStatus(skuId);
         return Result.build("", codeEnum);
+    }
+
+    /**
+     * 提交秒杀单
+     *
+     * @param orderInfo
+     * @return
+     */
+    @PostMapping("/submitOrder")
+    public Result submitOrder(@RequestBody OrderInfo orderInfo) {
+
+        Long orderId = bizService.submitSeckillOrder(orderInfo);
+        //响应订单id
+        return Result.ok(orderId.toString());
     }
 
 }

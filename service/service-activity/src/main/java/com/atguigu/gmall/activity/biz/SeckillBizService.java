@@ -1,6 +1,8 @@
 package com.atguigu.gmall.activity.biz;
 
 import com.atguigu.gmall.common.result.ResultCodeEnum;
+import com.atguigu.gmall.model.order.OrderInfo;
+import com.atguigu.gmall.model.vo.seckill.SeckillOrderConfirmVo;
 
 public interface SeckillBizService {
     /**
@@ -36,4 +38,20 @@ public interface SeckillBizService {
      * @return
      */
     ResultCodeEnum checkSeckillOrderStatus(Long skuId);
+
+    /**
+     * 获取秒杀页确认数据
+     *
+     * @param skuId
+     * @return
+     */
+    SeckillOrderConfirmVo getSeckillOrderConfirmVo(Long skuId);
+
+    /**
+     * 提交秒杀单信息
+     *
+     * @param orderInfo
+     * @return
+     */
+    Long submitSeckillOrder(OrderInfo orderInfo);
 }

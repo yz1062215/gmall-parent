@@ -23,22 +23,36 @@ public class OrderApiController {
 
     //确认订单
     @GetMapping("/confirm/data")
-    public Result<OrderConfirmDataVo> confirmOrderInfo(){
-        OrderConfirmDataVo vo=orderBizService.getConfirmData();
+    public Result<OrderConfirmDataVo> confirmOrderInfo() {
+        OrderConfirmDataVo vo = orderBizService.getConfirmData();
         return Result.ok(vo);
     }
 
     /**
      * 查询某个订单信息
+     *
      * @param orderId
      * @return
      */
     @GetMapping("/info/{orderId}")
-    public Result<OrderInfo> getOrderInfo(@PathVariable("orderId") Long orderId){
+    public Result<OrderInfo> getOrderInfo(@PathVariable("orderId") Long orderId) {
 
         OrderInfo orderInfo = orderInfoService.getOne(new LambdaQueryWrapper<OrderInfo>()
                 .eq(OrderInfo::getId, orderId)
                 .eq(OrderInfo::getUserId, AuthUtils.getCurrentAuthInfo().getUserId()));
         return Result.ok(orderInfo);
+    }
+
+    /**
+     * 保存秒杀单
+     *
+     * @param info
+     * @return
+     */
+    @PostMapping("/seckillorder/submit")
+    public Result<Long> submitSeckillOrder(@RequestBody OrderInfo info) {
+
+        Long orderId = orderInfoService.submitSeckillOrder(info);
+        return Result.ok(orderId);
     }
 }

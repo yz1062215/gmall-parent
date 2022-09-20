@@ -40,30 +40,32 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Autowired
     RabbitTemplate rabbitTemplate;
+
     @Transactional  //开启事务
     @Override
     public Long saveOrder(OrderSubmitVo submitVo, String tradeNo) {
         //1.准备订单数剧
-        OrderInfo orderInfo=prepareOrderInfo(submitVo,tradeNo);
+        OrderInfo orderInfo = prepareOrderInfo(submitVo, tradeNo);
         //2.保存OrderInfo
         orderInfoMapper.insert(orderInfo);
 
 
         //3.保存OrderDetail
-        List<OrderDetail> details = prepareOrderDetail(submitVo,orderInfo);
+        List<OrderDetail> details = prepareOrderDetail(submitVo, orderInfo);
 
         //批量保存到订单详情库
         orderDetailService.saveBatch(details);
 
         //创建订单完成发送消息
-        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(),orderInfo.getUserId());
-        rabbitTemplate.convertAndSend(MqConst.EXCHANGE_ORDER_EVNT,MqConst.RK_ORDER_CREATED, Jsons.toStr(orderMsg));
+        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(), orderInfo.getUserId());
+        rabbitTemplate.convertAndSend(MqConst.EXCHANGE_ORDER_EVNT, MqConst.RK_ORDER_CREATED, Jsons.toStr(orderMsg));
         //4.返回订单id
         return orderInfo.getId();//雪花算法生成的id
     }
 
     /**
      * 改变订单状态
+     *
      * @param orderId
      * @param userId
      * @param closed
@@ -75,11 +77,12 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         String processStatus = closed.name();
         String orderStatus = closed.getOrderStatus().name();
 
-        orderInfoMapper.changeOrderStatus(orderId,userId,processStatus,orderStatus,expecteds);
+        orderInfoMapper.changeOrderStatus(orderId, userId, processStatus, orderStatus, expecteds);
     }
 
     /**
      * 根据用户id和对外流水号查询订单信息
+     *
      * @param outTradeNo
      * @param userId
      * @return
@@ -88,7 +91,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     public OrderInfo getOrderInfoByOutTradeNoAndUserId(String outTradeNo, Long userId) {
         return orderInfoMapper.selectOne(new LambdaQueryWrapper<OrderInfo>()
                 .eq(OrderInfo::getUserId, userId)
-                .eq(OrderInfo::getOutTradeNo,outTradeNo));
+                .eq(OrderInfo::getOutTradeNo, outTradeNo));
     }
 
     @Override
@@ -96,11 +99,34 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         return orderInfoMapper.selectOne(new LambdaQueryWrapper<OrderInfo>()
                 .eq(OrderInfo::getUserId, userId)
-                .eq(OrderInfo::getId,orderId));
+                .eq(OrderInfo::getId, orderId));
+    }
+
+    /**
+     * 保存秒杀单信息
+     *
+     * @param info
+     * @return
+     */
+    @Override
+    public Long submitSeckillOrder(OrderInfo info) {
+        //1、保存秒杀单基本信息
+        int insert = orderInfoMapper.insert(info);
+        Long id = info.getId();
+
+        //2、保存明细
+        List<OrderDetail> list = info.getOrderDetailList();
+        list.stream().forEach(item -> {
+            item.setOrderId(id);
+        });
+        orderDetailService.saveBatch(list);
+
+        return id;
     }
 
     /**
      * 保存订单详情信息
+     *
      * @param submitVo
      * @param orderInfo
      * @return
@@ -135,6 +161,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     /**
      * 准备orderInfo
+     *
      * @param submitVo
      * @param tradeNo
      * @return
@@ -160,7 +187,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         //7.订单创建时间
         orderInfo.setCreateTime(new Date());
         //8.订单过期时间  未支付45分钟后过期   订单状态变为关闭状态
-        orderInfo.setExpireTime(new Date(System.currentTimeMillis()+1000* SysRedisConst.ORDER_CLOSE_TTL));
+        orderInfo.setExpireTime(new Date(System.currentTimeMillis() + 1000 * SysRedisConst.ORDER_CLOSE_TTL));
         //9.订单受理状态
         orderInfo.setProcessStatus(ProcessStatus.UNPAID.name()); //默认初始为未支付
         orderInfo.setOrderStatus(OrderStatus.UNPAID.name());
